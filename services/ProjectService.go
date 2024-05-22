@@ -77,8 +77,16 @@ func (svc ProjectStatusRepo) CreateProject(e echo.Context) error {
 }
 
 func (svc *ProjectStatusRepo) GetProjectStatus(e echo.Context) error {
-	projectNameStr := e.Param("projectName")
-	projectStatus, err := svc.ProjectStatusRepo.GetByProjectName(projectNameStr)
+	projectName := e.Param("id")
+	projectNameStr, err := uuid.Parse(projectName)
+	if err != nil {
+		return e.JSON(http.StatusBadRequest, map[string]interface{}{
+			"httpStatus": http.StatusBadRequest,
+			"time":       constants.TIME_NOW,
+			"message":    "Invalid project UUID",
+		})
+	}
+	projectStatus, err := svc.ProjectStatusRepo.GetByProjectId(projectNameStr)
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {

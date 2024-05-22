@@ -1,9 +1,21 @@
 package main
 
-import "daijai-service/routers"
+import (
+	"daijai-service/routers"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+)
 
 func main() {
-	e := routers.ProjectRouter()
+	e := echo.New()
+
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+
+	routers.ProjectRouter(e)
+	routers.Category3Router(e)
+	routers.MaterialFieldsRouter(e)
+	routers.MaterialDetailRouter(e)
 
 	routers.Execute(e)
 }
