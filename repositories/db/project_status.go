@@ -24,9 +24,9 @@ func (repo ProjectStatus) Insert(projectStatus dao.ProjectStatus) error {
 	return nil
 }
 
-func (repo ProjectStatus) GetByProjectName(projectName string) (dao.ProjectStatus, error) {
+func (repo ProjectStatus) GetByProjectId(projectId uuid.UUID) (dao.ProjectStatus, error) {
 	var projectStatus dao.ProjectStatus
-	err := repo.db.Where("project_name = ?", projectName).First(&projectStatus).Error
+	err := repo.db.Where("project_id = ?", projectId).First(&projectStatus).Error
 	if err != nil {
 		return projectStatus, err
 	}
@@ -58,7 +58,6 @@ func (repo *ProjectStatus) UpdateProjectStatus(project dao.ProjectStatus) (dao.P
 		log.Printf("Error updating project status: %v", err)
 		return response, err
 	}
-
 	return response, nil
 }
 

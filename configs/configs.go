@@ -20,13 +20,19 @@ func InitDb() *gorm.DB {
 		panic("failed to connect database")
 	}
 
-	err = db.AutoMigrate(&dao.ProjectStatus{})
+	err = db.AutoMigrate(
+		&dao.Category3{},
+		&dao.ProjectStatus{},
+		&dao.MaterialFields{},
+		&dao.MaterialFieldDetails{},
+	)
 	if err != nil {
 		panic("failed to migrate database")
 	}
 
 	log.Println("Database migrated")
 	return db
+
 }
 
 func GetDBInstance() *gorm.DB {
