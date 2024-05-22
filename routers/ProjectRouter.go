@@ -19,8 +19,10 @@ func ProjectRouter() *echo.Echo {
 
 	g := e.Group("/user", middleware.ValidateTokenMiddleware)
 	g.POST("/v1/daijai/project", projectStatusSvc.CreateProject)
-	g.GET("/v1/daijai/:projectId", projectStatusSvc.GetProjectStatus)
+	g.GET("/v1/daijai/:projectName", projectStatusSvc.GetProjectStatus)
 	g.GET("/v1/daijai/getall", projectStatusSvc.GetAllProject)
+	g.PUT("/v1/daijai/update-project", projectStatusSvc.UpdateProject)
+	//g.DELETE("/v1/daijai/project/delete-project", projectStatusSvc.DeleteProject)
 	return e
 }
 
