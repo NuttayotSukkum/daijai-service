@@ -7,6 +7,8 @@ import (
 
 type ProjectStatus interface {
 	Insert(projectStatus dao.ProjectStatus) error
-	GetByProjectId(projectId uuid.UUID) (dao.ProjectStatus, error)
+	GetByProjectName(projectName string) (dao.ProjectStatus, error)
 	GetAllProjectStatus() ([]dao.ProjectStatus, error)
+	UpdateProjectStatus(project dao.ProjectStatus) (dao.ProjectStatus, error)
+	DeleteProject(projectId uuid.UUID) error
 }

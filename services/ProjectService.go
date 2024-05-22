@@ -1,6 +1,7 @@
 package services
 
 import (
+	"daijai-service/constants"
 	"daijai-service/models/dao"
 	"daijai-service/models/requests"
 	"daijai-service/repositories"
@@ -76,17 +77,9 @@ func (svc ProjectStatusRepo) CreateProject(e echo.Context) error {
 }
 
 func (svc *ProjectStatusRepo) GetProjectStatus(e echo.Context) error {
-	projectIdStr := e.Param("projectId")
-	projectId, err := uuid.Parse(projectIdStr)
-	if err != nil {
-		return e.JSON(http.StatusBadRequest, map[string]interface{}{
-			"httpStatus": http.StatusBadRequest,
-			"time":       time.Now().Format("2006-01-02 15:04:05"),
-			"message":    "Invalid project ID",
-		})
-	}
+	projectNameStr := e.Param("projectName")
+	projectStatus, err := svc.ProjectStatusRepo.GetByProjectName(projectNameStr)
 
-	projectStatus, err := svc.ProjectStatusRepo.GetByProjectId(projectId)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return e.JSON(http.StatusNotFound, map[string]interface{}{
@@ -124,5 +117,104 @@ func (svc ProjectStatusRepo) GetAllProject(e echo.Context) error {
 		"httpStatus": http.StatusOK,
 		"time":       time.Now().Format("2006-01-02 15:04:05"),
 		"project":    project,
+	})
+}
+
+func (svc ProjectStatusRepo) UpdateProject(e echo.Context) error {
+	var rq requests.RequestProjectStatus
+	if err := e.Bind(&rq); err != nil {
+		return e.JSON(http.StatusUnprocessableEntity, map[string]interface{}{
+			"httpStatus": http.StatusUnprocessableEntity,
+			"time":       time.Now().Format("2006-01-02 15:04:05"),
+			"message":    err,
+		})
+	}
+	if rq.ProjectName == "" {
+		return e.JSON(http.StatusBadRequest, map[string]interface{}{
+			"httpStatus": http.StatusBadRequest,
+			"time":       constants.TIME_NOW,
+			"message":    "Project name is empty",
+		})
+	}
+	if rq.CreatedBy == "" {
+		return e.JSON(http.StatusBadRequest, map[string]interface{}{
+			"httpStatus": http.StatusBadRequest,
+			"time":       constants.TIME_NOW,
+			"message":    "create by is empty",
+		})
+	}
+	if rq.Status == "" {
+		return e.JSON(http.StatusBadRequest, map[string]interface{}{
+			"httpStatus": http.StatusBadRequest,
+			"time":       constants.TIME_NOW,
+			"message":    "Status name is empty",
+		})
+	}
+
+	project := dao.ProjectStatus{
+		ProjectName: strings.TrimSpace(strings.ToUpper(rq.ProjectName)),
+		Status:      strings.TrimSpace(strings.ToUpper(rq.Status)),
+		CreatedBy:   strings.TrimSpace(strings.ToUpper(rq.CreatedBy)),
+		UpdatedAt:   constants.TIME_NOW,
+		Details:     false,
+	}
+
+	projectStatus, err := svc.ProjectStatusRepo.UpdateProjectStatus(project)
+
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return e.JSON(http.StatusNotFound, map[string]interface{}{
+				"httpStatus": http.StatusNotFound,
+				"time":       time.Now().Format("2006-01-02 15:04:05"),
+				"message":    "Project not found",
+			})
+		}
+		return e.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"httpStatus": http.StatusInternalServerError,
+			"time":       time.Now().Format("2006-01-02 15:04:05"),
+			"message":    err.Error(),
+		})
+	}
+	return e.JSON(http.StatusOK, map[string]interface{}{
+		"httpStatus":  http.StatusOK,
+		"time":        time.Now().Format("2006-01-02 15:04:05"),
+		"projectName": projectStatus.ProjectName,
+		"message":     projectStatus,
+		"status":      "update Project Success",
+	})
+
+}
+
+func (svc ProjectStatusRepo) DeleteProject(e echo.Context) error {
+	projectIdStr := e.Param("projectId")
+	projectId, err := uuid.Parse(projectIdStr)
+	if err != nil {
+		return e.JSON(http.StatusBadRequest, map[string]interface{}{
+			"httpStatus": http.StatusBadRequest,
+			"time":       time.Now().Format("2006-01-02 15:04:05"),
+			"message":    "Invalid project ID",
+		})
+	}
+	err = svc.ProjectStatusRepo.DeleteProject(projectId)
+
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return e.JSON(http.StatusNotFound, map[string]interface{}{
+				"httpStatus": http.StatusNotFound,
+				"time":       time.Now().Format("2006-01-02 15:04:05"),
+				"message":    "Project not found",
+			})
+		}
+		return e.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"httpStatus": http.StatusInternalServerError,
+			"time":       time.Now().Format("2006-01-02 15:04:05"),
+			"message":    err.Error(),
+		})
+	}
+	return e.JSON(http.StatusOK, map[string]interface{}{
+		"http":      http.StatusOK,
+		"time":      constants.TIME_NOW,
+		"projectId": projectId,
+		"message":   "delete success",
 	})
 }
