@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type Category3Repo struct {
@@ -46,8 +47,8 @@ func (svc Category3Repo) CreateCategory3(e echo.Context) error {
 		})
 	}
 	cat3 := dao.Category3{
-		Name: rq.Name,
-		Code: rq.Code,
+		Name: strings.TrimSpace(rq.Name),
+		Code: strings.TrimSpace(strings.ToUpper(rq.Code)),
 	}
 	log.Println("Cate3:{}", cat3)
 	cat3Existing := svc.Category3Repo.CheckCat3isExist(cat3)
@@ -95,7 +96,6 @@ func (svc Category3Repo) GetCategory3All(e echo.Context) error {
 func (svc Category3Repo) GetCat3(e echo.Context) error {
 	var cat3 = e.Param("id")
 	cat3Int, err := strconv.Atoi(cat3)
-	cat3Uint := uint(cat3Int)
 	if err != nil {
 		return e.JSON(http.StatusBadRequest, handlers.ErrorResponse{
 			HTTPStatus: http.StatusBadRequest,
@@ -103,7 +103,7 @@ func (svc Category3Repo) GetCat3(e echo.Context) error {
 			Message:    err.Error(),
 		})
 	}
-	cat3Str, err := svc.Category3Repo.GetCat3ById(cat3Uint)
+	cat3Str, err := svc.Category3Repo.GetCat3ById(cat3Int)
 	if err != nil {
 		return e.JSON(http.StatusBadRequest, handlers.ErrorResponse{
 			HTTPStatus: http.StatusBadRequest,

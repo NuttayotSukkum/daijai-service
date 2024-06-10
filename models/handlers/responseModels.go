@@ -36,25 +36,31 @@ type SuccessReposeDataCat3 struct {
 }
 
 type SuccessResponseListMaterialFields struct {
-	HTTPStatus int                  `json:"httpStatus"`
-	Time       string               `json:"time"`
-	Data       []dao.MaterialFields `json:"data"`
+	HTTPStatus int                 `json:"httpStatus"`
+	Time       string              `json:"time"`
+	Data       []dao.MaterialField `json:"data"`
 }
 
 type SuccessResponseMaterialFields struct {
-	HTTPStatus int                `json:"httpStatus"`
-	Time       string             `json:"time"`
-	Data       dao.MaterialFields `json:"data"`
+	HTTPStatus int               `json:"httpStatus"`
+	Time       string            `json:"time"`
+	Data       dao.MaterialField `json:"data"`
 }
 
 type SuccessResponseMaterialFieldDetailsList struct {
-	HTTPStatus int                        `json:"httpStatus"`
-	Time       string                     `json:"time"`
-	Data       []dao.MaterialFieldDetails `json:"data"`
+	HTTPStatus int                       `json:"httpStatus"`
+	Time       string                    `json:"time"`
+	Data       []dao.MaterialFieldDetail `json:"data"`
 }
 
 type SuccessResponseMaterialFieldDetails struct {
-	HTTPStatus int                      `json:"httpStatus"`
-	Time       string                   `json:"time"`
-	Data       dao.MaterialFieldDetails `json:"data"`
+	HTTPStatus int                     `json:"httpStatus"`
+	Time       string                  `json:"time"`
+	Data       dao.MaterialFieldDetail `json:"data"`
+}
+
+type SuccessResponseMaterialDetails struct {
+	HTTPStatus int          `json:"httpStatus"`
+	Time       string       `json:"time"`
+	Data       dao.Material `json:"data"`
 }

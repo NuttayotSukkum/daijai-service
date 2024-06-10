@@ -16,7 +16,7 @@ func NewMaterialDetailsRepository(db *gorm.DB) repositories.MaterialFieldsDetail
 	return &MaterialDetailRepo{db: db}
 }
 
-func (repo MaterialDetailRepo) Insert(req dao.MaterialFieldDetails) error {
+func (repo MaterialDetailRepo) Insert(req dao.MaterialFieldDetail) error {
 	err := repo.db.Create(&req).Error
 	if err != nil {
 		return err
@@ -25,7 +25,7 @@ func (repo MaterialDetailRepo) Insert(req dao.MaterialFieldDetails) error {
 }
 
 func (repo MaterialDetailRepo) CheckExisting(name string) bool {
-	var response dao.MaterialFieldDetails
+	var response dao.MaterialFieldDetail
 	err := repo.db.Where("name = ?", name).First(&response).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -36,31 +36,31 @@ func (repo MaterialDetailRepo) CheckExisting(name string) bool {
 	return true
 }
 
-func (repo MaterialDetailRepo) GetMaterialAll() []dao.MaterialFieldDetails {
-	var response []dao.MaterialFieldDetails
-	err := repo.db.Find(&response).Error
+func (repo MaterialDetailRepo) GetMaterialAll() []dao.MaterialFieldDetail {
+	var response []dao.MaterialFieldDetail
+	err := repo.db.Preload("MaterialField").Find(&response).Error
 	if err != nil {
 		return nil
 	}
 	return response
 }
 
-func (repo MaterialDetailRepo) GetMaterialById(id uint) dao.MaterialFieldDetails {
-	var response dao.MaterialFieldDetails
+func (repo MaterialDetailRepo) GetMaterialById(id int) dao.MaterialFieldDetail {
+	var response dao.MaterialFieldDetail
 	err := repo.db.Where("id = ?", id).First(&response).Error
 	if err != nil {
 		log.Println("error:{}", err)
-		return dao.MaterialFieldDetails{}
+		return dao.MaterialFieldDetail{}
 	}
 	return response
 }
 
-func (repo MaterialDetailRepo) GetMaterialByMaterialFields(id string) dao.MaterialFieldDetails {
-	var response dao.MaterialFieldDetails
+func (repo MaterialDetailRepo) GetMaterialByMaterialFields(id string) dao.MaterialFieldDetail {
+	var response dao.MaterialFieldDetail
 	err := repo.db.Where("material_fields = ?", id).First(&response).Error
 	if err != nil {
 		log.Println("error:{}", err)
-		return dao.MaterialFieldDetails{}
+		return dao.MaterialFieldDetail{}
 	}
 	return response
 }
