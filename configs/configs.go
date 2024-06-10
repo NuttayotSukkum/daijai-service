@@ -23,8 +23,10 @@ func InitDb() *gorm.DB {
 	err = db.AutoMigrate(
 		&dao.Category3{},
 		&dao.ProjectStatus{},
-		&dao.MaterialFields{},
-		&dao.MaterialFieldDetails{},
+		&dao.MaterialField{},
+		&dao.MaterialFieldDetail{},
+		&dao.Material{},
+		&dao.MaterialDetail{},
 	)
 	if err != nil {
 		panic("failed to migrate database")

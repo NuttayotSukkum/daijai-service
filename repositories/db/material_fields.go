@@ -16,7 +16,7 @@ func NewMaterialFieldsRepository(db *gorm.DB) repositories.MaterialFields {
 	return &MaterialFields{db: db}
 }
 
-func (repo MaterialFields) Insert(req dao.MaterialFields) error {
+func (repo MaterialFields) Insert(req dao.MaterialField) error {
 	err := repo.db.Create(&req).Error
 	if err != nil {
 		return err
@@ -24,8 +24,8 @@ func (repo MaterialFields) Insert(req dao.MaterialFields) error {
 	return nil
 }
 
-func (repo MaterialFields) CheckExisting(req dao.MaterialFields) bool {
-	var result dao.MaterialFields
+func (repo MaterialFields) CheckExisting(req dao.MaterialField) bool {
+	var result dao.MaterialField
 	err := repo.db.Where("name = ?", req.Name).First(&result).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -36,8 +36,8 @@ func (repo MaterialFields) CheckExisting(req dao.MaterialFields) bool {
 	return true
 }
 
-func (repo MaterialFields) GetMaterialAll() []dao.MaterialFields {
-	var response []dao.MaterialFields
+func (repo MaterialFields) GetMaterialAll() []dao.MaterialField {
+	var response []dao.MaterialField
 	err := repo.db.Find(&response).Error
 	if err != nil {
 		return nil
@@ -45,12 +45,12 @@ func (repo MaterialFields) GetMaterialAll() []dao.MaterialFields {
 	return response
 }
 
-func (repo MaterialFields) GetMaterialById(id uint) dao.MaterialFields {
-	var response dao.MaterialFields
+func (repo MaterialFields) GetMaterialById(id int) dao.MaterialField {
+	var response dao.MaterialField
 	err := repo.db.Where("id = ?", id).First(&response).Error
 	if err != nil {
 		log.Println("error db.material_fields:{}", err)
-		return dao.MaterialFields{}
+		return dao.MaterialField{}
 	}
 	return response
 }

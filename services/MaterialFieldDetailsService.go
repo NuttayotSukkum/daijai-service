@@ -9,6 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type MaterialDetailsRepo struct {
@@ -28,7 +29,7 @@ func (svc MaterialDetailsRepo) CreateMaterialDetail(e echo.Context) error {
 			Message:    err.Error(),
 		})
 	}
-	if req.MaterialFields == "" {
+	if req.MaterialFieldsId == "" {
 		return e.JSON(http.StatusBadRequest, handlers.ErrorResponse{
 			HTTPStatus: http.StatusBadRequest,
 			Time:       constants.TIME_NOW,
@@ -50,10 +51,19 @@ func (svc MaterialDetailsRepo) CreateMaterialDetail(e echo.Context) error {
 		})
 	}
 
-	mapper := dao.MaterialFieldDetails{
-		MaterialFields: req.MaterialFields,
-		Name:           req.Name,
-		Code:           req.Code,
+	materialFieldIdInt, err := strconv.Atoi(req.MaterialFieldsId)
+	if err != nil {
+		return e.JSON(http.StatusBadRequest, handlers.ErrorResponse{
+			HTTPStatus: http.StatusBadRequest,
+			Time:       constants.TIME_NOW,
+			Message:    constants.CAN_NOT_CONVERT,
+		})
+	}
+
+	mapper := dao.MaterialFieldDetail{
+		MaterialFieldId: materialFieldIdInt,
+		Name:            strings.TrimSpace(strings.ToUpper(req.Name)),
+		Code:            strings.TrimSpace(req.Code),
 	}
 	exist := svc.MaterialDetailsRepo.CheckExisting(req.Name)
 
@@ -65,7 +75,7 @@ func (svc MaterialDetailsRepo) CreateMaterialDetail(e echo.Context) error {
 		})
 	}
 
-	err := svc.MaterialDetailsRepo.Insert(mapper)
+	err = svc.MaterialDetailsRepo.Insert(mapper)
 	if err != nil {
 		return e.JSON(http.StatusUnprocessableEntity, handlers.ErrorResponse{
 			HTTPStatus: http.StatusUnprocessableEntity,
@@ -100,8 +110,7 @@ func (svc MaterialDetailsRepo) GetMaterial(e echo.Context) error {
 			Message:    err.Error(),
 		})
 	}
-	idUint := uint(idInt)
-	response := svc.MaterialDetailsRepo.GetMaterialById(idUint)
+	response := svc.MaterialDetailsRepo.GetMaterialById(idInt)
 	return e.JSON(http.StatusOK, handlers.SuccessResponseMaterialFieldDetails{
 		HTTPStatus: http.StatusOK,
 		Time:       constants.TIME_NOW,

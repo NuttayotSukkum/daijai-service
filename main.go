@@ -16,6 +16,7 @@ func main() {
 	routers.Category3Router(e)
 	routers.MaterialFieldsRouter(e)
 	routers.MaterialDetailRouter(e)
+	routers.MaterialRouter(e)
 
 	routers.Execute(e)
 }

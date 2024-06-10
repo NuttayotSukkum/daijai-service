@@ -3,6 +3,7 @@ package db
 import (
 	"daijai-service/models/dao"
 	"daijai-service/repositories"
+	"github.com/pkg/errors"
 	"gorm.io/gorm"
 	"log"
 )
@@ -49,11 +50,25 @@ func (repo *Category3) CheckCat3isExist(req dao.Category3) bool {
 	return true
 }
 
-func (repo *Category3) GetCat3ById(id uint) (dao.Category3, error) {
+func (repo *Category3) GetCat3ById(id int) (dao.Category3, error) {
 	var response dao.Category3
 	err := repo.db.Where("id = ?", id).First(&response)
 	if err != nil {
 		return response, err.Error
 	}
 	return response, nil
+}
+
+func (repo *Category3) FindCat3ById(id int) (dao.Category3, error) {
+	var res dao.Category3
+	err := repo.db.Where("id = ?", id).First(&res).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Println("Category3 not found")
+			return res, nil
+		}
+		log.Printf("Error finding Category3 by ID: %v", err)
+		return res, err
+	}
+	return res, nil
 }

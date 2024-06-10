@@ -15,3 +15,7 @@ type Category3 interface {
 	GetCategory3All(e echo.Context) error
 	GetCat3(e echo.Context) error
 }
+
+type Material interface {
+	CreateMaterials(e echo.Context) error
+}

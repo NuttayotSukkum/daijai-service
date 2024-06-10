@@ -1,12 +1,13 @@
 package dao
 
-type MaterialFieldDetails struct {
-	Id             uint `gorm:"primarykey"`
-	MaterialFields string
-	Name           string
-	Code           string
+type MaterialFieldDetail struct {
+	Id              int `gorm:"primaryKey"`
+	MaterialFieldId int
+	MaterialField   MaterialField `gorm:"foreignKey:MaterialFieldId;references:Id"`
+	Name            string
+	Code            string
 }
 
-func (MaterialFieldDetails) TableName() string {
+func (MaterialFieldDetail) TableName() string {
 	return "tbl_material_field_details"
 }

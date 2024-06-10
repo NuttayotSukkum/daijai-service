@@ -9,6 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type MaterialRepo struct {
@@ -35,8 +36,8 @@ func (svc MaterialRepo) CreateMaterialField(e echo.Context) error {
 			Message:    constants.NAME_IS_EMPTY,
 		})
 	}
-	mapper := dao.MaterialFields{
-		Name: req.Name,
+	mapper := dao.MaterialField{
+		Name: strings.TrimSpace(strings.ToUpper(req.Name)),
 	}
 	exist := svc.MaterialRepo.CheckExisting(mapper)
 	if exist == true {
@@ -80,8 +81,7 @@ func (svc MaterialRepo) GetMaterialById(e echo.Context) error {
 			Message:    err.Error(),
 		})
 	}
-	idUint := uint(idInt)
-	response := svc.MaterialRepo.GetMaterialById(idUint)
+	response := svc.MaterialRepo.GetMaterialById(idInt)
 	return e.JSON(http.StatusOK, handlers.SuccessResponseMaterialFields{
 		HTTPStatus: http.StatusOK,
 		Time:       constants.TIME_NOW,

@@ -1,7 +1,7 @@
 package dao
 
 type Category3 struct {
-	ID   uint `gorm:"primarykey"`
+	Id   int `gorm:"primarykey"`
 	Name string
 	Code string
 }
