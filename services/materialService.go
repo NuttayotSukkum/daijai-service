@@ -94,11 +94,11 @@ func (svc MaterialsRepo) CreateMaterials(e echo.Context) error {
 			MaterialFieldDetailId: code,
 			CodeOrder:             index + 1,
 		}
-		
+
 		materialDetail, err := svc.MaterialDetailsRepo.Insert(materialDetailMapper)
 		log.Printf("materialDetail: %v", materialDetail)
 		if err != nil {
-			log.Printf("Error inserting material detail for code %s: %v", code, err)
+			log.Printf("Error inserting material detail for code %v: %v", code, err)
 			continue
 		}
 		materialFieldDetail := svc.MaterialFieldsDetailRepo.GetMaterialById(materialDetail.MaterialFieldDetailId)
@@ -122,4 +122,22 @@ func (svc MaterialsRepo) CreateMaterials(e echo.Context) error {
 		Time:       constants.TIME_NOW,
 		Data:       materials,
 	})
+}
+
+func (svc MaterialsRepo) GetMaterials(e echo.Context) error {
+	material, err := svc.MaterialsRepo.GetALL()
+	if err != nil {
+		return e.JSON(http.StatusBadRequest, handlers.ErrorResponse{
+			HTTPStatus: http.StatusBadRequest,
+			Time:       constants.TIME_NOW,
+			Message:    err.Error(),
+		})
+	}
+	return e.JSON(http.StatusOK, handlers.SuccessResponseMaterialList{
+		HTTPStatus: http.StatusOK,
+		Time:       constants.TIME_NOW,
+		Code:       200,
+		Data:       material,
+	})
+
 }

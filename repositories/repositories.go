@@ -41,6 +41,7 @@ type Material interface {
 	//Insert(material dao.Material) (dao.Material, error)
 	Insert(material dao.Material) (dao.Material, error)
 	Update(material dao.Material) (dao.Material, error)
+	GetALL() ([]dao.Material, error)
 }
 
 type MaterialDetails interface {

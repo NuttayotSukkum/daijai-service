@@ -3,6 +3,7 @@ package db
 import (
 	"daijai-service/models/dao"
 	"daijai-service/repositories"
+	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -31,4 +32,16 @@ func (repo *MaterialRepo) Update(material dao.Material) (dao.Material, error) {
 	}
 
 	return updatedMaterial, nil
+}
+
+func (repo *MaterialRepo) GetALL() ([]dao.Material, error) {
+	var materials []dao.Material
+	err := repo.db.Preload("Category3").Find(&materials).Error
+	if err != nil {
+		return materials, err
+	}
+	if len(materials) == 0 {
+		return materials, fmt.Errorf("no material found")
+	}
+	return materials, nil
 }
