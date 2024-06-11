@@ -20,4 +20,5 @@ func MaterialRouter(e *echo.Echo) {
 
 	g := e.Group("/user", middleware.ValidateTokenMiddleware)
 	g.POST("/v1/daijai/material/create", materialSvc.CreateMaterials)
+	g.GET("/v1/daijai/material/materials", materialSvc.GetMaterials)
 }

@@ -64,3 +64,10 @@ type SuccessResponseMaterialDetails struct {
 	Time       string       `json:"time"`
 	Data       dao.Material `json:"data"`
 }
+
+type SuccessResponseMaterialList struct {
+	HTTPStatus int            `json:"httpStatus"`
+	Time       string         `json:"time"`
+	Code       int            `json:"code"`
+	Data       []dao.Material `json:"data"`
+}
