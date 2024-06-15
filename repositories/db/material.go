@@ -45,3 +45,18 @@ func (repo *MaterialRepo) GetALL() ([]dao.Material, error) {
 	}
 	return materials, nil
 }
+
+func (repo *MaterialRepo) FindMaterialsExist(id int) []dao.Material {
+	if err := repo.db.Where("id = ?", id).Find(&dao.Material{}).Error; err != nil {
+		return nil
+	}
+	return []dao.Material{}
+}
+
+func (repo *MaterialRepo) FindMaterialsById(id int) dao.Material {
+	var material dao.Material
+	if err := repo.db.Where("id = ?", id).Preload("Category3").First(&material).Error; err != nil {
+		return dao.Material{}
+	}
+	return material
+}

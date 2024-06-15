@@ -27,6 +27,9 @@ func InitDb() *gorm.DB {
 		&dao.MaterialFieldDetail{},
 		&dao.Material{},
 		&dao.MaterialDetail{},
+		&dao.EstimateItemTypes{},
+		&dao.EstimateItem{},
+		&dao.EstimateItemMaterial{},
 	)
 	if err != nil {
 		panic("failed to migrate database")
