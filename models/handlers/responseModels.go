@@ -1,6 +1,9 @@
 package handlers
 
-import "daijai-service/models/dao"
+import (
+	"daijai-service/models/dao"
+	"daijai-service/models/response"
+)
 
 type ErrorResponse struct {
 	HTTPStatus int    `json:"httpStatus"`
@@ -70,4 +73,22 @@ type SuccessResponseMaterialList struct {
 	Time       string         `json:"time"`
 	Code       int            `json:"code"`
 	Data       []dao.Material `json:"data"`
+}
+
+type SuccessResponseEstimateItemTypeList struct {
+	HTTPStatus int                     `json:"httpStatus"`
+	Time       string                  `json:"time"`
+	Data       []dao.EstimateItemTypes `json:"data"`
+}
+
+type SuccessResponseEstimateItemList struct {
+	HTTPStatus int                `json:"httpStatus"`
+	Time       string             `json:"time"`
+	Data       []dao.EstimateItem `json:"data"`
+}
+
+type SuccessResponseEstimateItemMaterial struct {
+	HTTPStatus int                               `json:"httpStatus"`
+	Time       string                            `json:"time"`
+	Data       response.EstimateItemTypeResponse `json:"data"`
 }

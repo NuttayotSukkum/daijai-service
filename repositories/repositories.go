@@ -42,8 +42,28 @@ type Material interface {
 	Insert(material dao.Material) (dao.Material, error)
 	Update(material dao.Material) (dao.Material, error)
 	GetALL() ([]dao.Material, error)
+	FindMaterialsExist(id int) []dao.Material
+	FindMaterialsById(id int) dao.Material
 }
 
 type MaterialDetails interface {
 	Insert(material dao.MaterialDetail) (dao.MaterialDetail, error)
+}
+
+type EstimateItemType interface {
+	Insert(estimateItemType dao.EstimateItemTypes) error
+	FindEstimateItemTypesByName(name string) dao.EstimateItemTypes
+	FindEstimateItemTypesById(id int) ([]dao.EstimateItemTypes, error)
+	FindEstimateItemTypeAll() ([]dao.EstimateItemTypes, error)
+}
+
+type EstimateItem interface {
+	Insert(estimateItem dao.EstimateItem) error
+	FindEstimateItemAll() ([]dao.EstimateItem, error)
+	FindEstimateItemExist(id int) []dao.EstimateItem
+}
+
+type EstimateItemMaterial interface {
+	Insert(estimateItemMaterial dao.EstimateItemMaterial) (dao.EstimateItemMaterial, error)
+	//FindMaterialById(id int) dao.EstimateItemMaterial
 }

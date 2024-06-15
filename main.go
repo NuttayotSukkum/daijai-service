@@ -17,6 +17,9 @@ func main() {
 	routers.MaterialFieldsRouter(e)
 	routers.MaterialDetailRouter(e)
 	routers.MaterialRouter(e)
+	routers.EstimateItemType(e)
+	routers.EstimateItem(e)
+	routers.EstimateItemMaterial(e)
 
 	routers.Execute(e)
 }
