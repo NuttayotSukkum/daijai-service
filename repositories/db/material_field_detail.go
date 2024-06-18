@@ -47,7 +47,7 @@ func (repo MaterialDetailRepo) GetMaterialAll() []dao.MaterialFieldDetail {
 
 func (repo MaterialDetailRepo) GetMaterialById(id int) dao.MaterialFieldDetail {
 	var response dao.MaterialFieldDetail
-	err := repo.db.Where("id = ?", id).First(&response).Error
+	err := repo.db.Where("id = ?", id).Preload("MaterialField").First(&response).Error
 	if err != nil {
 		log.Println("error:{}", err)
 		return dao.MaterialFieldDetail{}
