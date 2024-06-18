@@ -111,6 +111,13 @@ func (svc MaterialDetailsRepo) GetMaterial(e echo.Context) error {
 		})
 	}
 	response := svc.MaterialDetailsRepo.GetMaterialById(idInt)
+	if len(response.Code) == 0 {
+		return e.JSON(http.StatusNotFound, handlers.ErrorResponse{
+			HTTPStatus: http.StatusNotFound,
+			Time:       constants.TIME_NOW,
+			Message:    constants.NOT_FOUND_DATA,
+		})
+	}
 	return e.JSON(http.StatusOK, handlers.SuccessResponseMaterialFieldDetails{
 		HTTPStatus: http.StatusOK,
 		Time:       constants.TIME_NOW,
