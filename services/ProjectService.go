@@ -3,28 +3,40 @@ package services
 import (
 	"daijai-service/constants"
 	"daijai-service/models/dao"
+	"daijai-service/models/handlers"
 	"daijai-service/models/requests"
+	"daijai-service/models/response"
 	"daijai-service/repositories"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
+	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
 
 type ProjectStatusRepo struct {
-	ProjectStatusRepo repositories.ProjectStatus
+	ProjectStatusRepo     repositories.ProjectStatus
+	EstimateItem          repositories.EstimateItem
+	EstimateItemMaterials repositories.EstimateItemMaterial
+	Material              repositories.Material
 }
 
-func NewProjectStatusService(repo repositories.ProjectStatus) *ProjectStatusRepo {
-	return &ProjectStatusRepo{ProjectStatusRepo: repo}
+func NewProjectStatusService(estimateItemMaterialRepo repositories.EstimateItemMaterial, materialsRepo repositories.Material, estimateItems repositories.EstimateItem, projectRepo repositories.ProjectStatus) *ProjectStatusRepo {
+	return &ProjectStatusRepo{
+		ProjectStatusRepo:     projectRepo,
+		EstimateItem:          estimateItems,
+		EstimateItemMaterials: estimateItemMaterialRepo,
+		Material:              materialsRepo,
+	}
 }
 
 func (svc ProjectStatusRepo) CreateProject(e echo.Context) error {
 	var r requests.RequestProjectStatus
 	if err := e.Bind(&r); err != nil {
-		return e.JSON(http.StatusUnprocessableEntity, map[string]interface{}{
+		return e.JSON(http.StatusBadRequest, map[string]interface{}{
 			"httpStatus": http.StatusUnprocessableEntity,
 			"time":       time.Now().Format("2006-01-02 15:04:05"),
 			"message":    err.Error(),
@@ -47,8 +59,7 @@ func (svc ProjectStatusRepo) CreateProject(e echo.Context) error {
 		})
 	}
 
-	project := dao.ProjectStatus{
-		ProjectId:   uuid.New(),
+	project := dao.Project{
 		ProjectName: strings.TrimSpace(strings.ToUpper(r.ProjectName)),
 		Status:      "Success Create Project",
 		CreatedBy:   strings.TrimSpace(strings.ToUpper(r.CreatedBy)),
@@ -77,16 +88,12 @@ func (svc ProjectStatusRepo) CreateProject(e echo.Context) error {
 }
 
 func (svc *ProjectStatusRepo) GetProjectStatus(e echo.Context) error {
-	projectName := e.Param("id")
-	projectNameStr, err := uuid.Parse(projectName)
+	projectIdStr := e.Param("id")
+	projectIdInt, err := strconv.Atoi(projectIdStr)
 	if err != nil {
-		return e.JSON(http.StatusBadRequest, map[string]interface{}{
-			"httpStatus": http.StatusBadRequest,
-			"time":       constants.TIME_NOW,
-			"message":    "Invalid project UUID",
-		})
+		log.Println(err.Error())
 	}
-	projectStatus, err := svc.ProjectStatusRepo.GetByProjectId(projectNameStr)
+	projectStatus, err := svc.ProjectStatusRepo.GetByProjectId(projectIdInt)
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -159,7 +166,7 @@ func (svc ProjectStatusRepo) UpdateProject(e echo.Context) error {
 		})
 	}
 
-	project := dao.ProjectStatus{
+	project := dao.Project{
 		ProjectName: strings.TrimSpace(strings.ToUpper(rq.ProjectName)),
 		Status:      strings.TrimSpace(strings.ToUpper(rq.Status)),
 		CreatedBy:   strings.TrimSpace(strings.ToUpper(rq.CreatedBy)),
@@ -225,4 +232,72 @@ func (svc ProjectStatusRepo) DeleteProject(e echo.Context) error {
 		"projectId": projectId,
 		"message":   "delete success",
 	})
+}
+
+func (svc *ProjectStatusRepo) GetEstimateItemList(e echo.Context) error {
+	projectIdStr := e.Param("ProjectId")
+	projectIdInt, err := strconv.Atoi(projectIdStr)
+	if err != nil {
+		return e.JSON(http.StatusBadRequest, handlers.ErrorResponse{
+			HTTPStatus: http.StatusBadRequest,
+			Time:       constants.TIME_NOW,
+			Message:    err.Error(),
+		})
+	}
+
+	projectMaterials := svc.EstimateItemMaterials.FindMaterialById(projectIdInt)
+	if len(projectMaterials) == 0 {
+		return e.JSON(http.StatusBadRequest, handlers.ErrorResponse{
+			HTTPStatus: http.StatusBadRequest,
+			Time:       constants.TIME_NOW,
+			Message:    "Project not found",
+		})
+	}
+
+	var responseProject response.ProjectResponseList
+	responseProject.Id = projectMaterials[0].Project.Id
+	responseProject.ProjectName = projectMaterials[0].Project.ProjectName
+	responseProject.CreateBy = projectMaterials[0].Project.CreatedAt
+
+	var itemAll response.EstimateItemAll
+
+	estimateItemType := make(map[int]*response.EstimateItemTypeResponseAll)
+	estimateItemsMap := make(map[int]*response.EstimateItemAll)
+
+	for _, material := range projectMaterials {
+		estimateItem := &material.EstimateItem
+
+		if _, ok := estimateItemType[estimateItem.EstimateItemType.Id]; !ok {
+			estimateItemType[estimateItem.EstimateItemType.Id] = &response.EstimateItemTypeResponseAll{
+				Id:   estimateItem.EstimateItemType.Id,
+				Name: estimateItem.EstimateItemType.Name,
+			}
+		}
+
+		if _, ok := estimateItemsMap[estimateItem.Id]; !ok {
+			itemAll := response.EstimateItemAll{
+				Id:                   estimateItem.Id,
+				Name:                 estimateItem.Name,
+				Code:                 estimateItem.Code,
+				Price:                estimateItem.Price,
+				EstimateItemMaterial: []response.EstimateItemMaterial{},
+			}
+			estimateItemType[estimateItem.EstimateItemType.Id].EstimateItem = append(estimateItemType[estimateItem.EstimateItemType.Id].EstimateItem, itemAll)
+		}
+
+		itemMaterial := response.EstimateItemMaterial{
+			MaterialAmount: material.MaterialAmount,
+			MaterialUnit:   material.MaterialUnit,
+			Material:       []dao.Material{material.Material},
+		}
+		log.Printf("itemMaterial: %s\n", itemMaterial)
+		estimateItemsMap[estimateItem.Id].EstimateItemMaterial = append(estimateItemsMap[estimateItem.Id].EstimateItemMaterial, itemMaterial)
+		itemAll.EstimateItemMaterial = estimateItemsMap[estimateItem.Id].EstimateItemMaterial
+	}
+
+	for _, estimateItemType := range estimateItemType {
+		responseProject.Detail = append(responseProject.Detail, *estimateItemType)
+	}
+
+	return e.JSON(http.StatusOK, responseProject)
 }

@@ -20,7 +20,12 @@ func (repo EstimateItemMaterial) Insert(material dao.EstimateItemMaterial) (dao.
 		return dao.EstimateItemMaterial{}, err
 	}
 	var response dao.EstimateItemMaterial
-	if err := repo.db.Where("id = ?", material.Id).Preload("EstimateItem").Preload("EstimateItem.EstimateItemType").First(&response).Error; err != nil {
+	if err := repo.db.Where("id = ?", material.Id).
+		Preload("EstimateItem").
+		Preload("EstimateItem.EstimateItemType").
+		Preload("Project").
+		First(&response).
+		Error; err != nil {
 		return dao.EstimateItemMaterial{}, err
 	}
 	log.Println(response)
@@ -28,6 +33,16 @@ func (repo EstimateItemMaterial) Insert(material dao.EstimateItemMaterial) (dao.
 
 }
 
-//func (repo *EstimateItemType) GetAll() (dao.EstimateItemTypes, error) {
-//
-//}
+func (repo *EstimateItemMaterial) FindMaterialById(projectId int) []dao.EstimateItemMaterial {
+	var estimateItemMaterial []dao.EstimateItemMaterial
+	if err := repo.db.Where("project_id = ?", projectId).
+		Preload("Material.Category3").
+		Preload("Material").
+		Preload("EstimateItem").
+		Preload("EstimateItem.EstimateItemType").
+		Preload("Project").
+		Find(&estimateItemMaterial).Error; err != nil {
+		return []dao.EstimateItemMaterial{}
+	}
+	return estimateItemMaterial
+}

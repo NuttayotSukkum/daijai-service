@@ -13,9 +13,12 @@ func EstimateItemType(e *echo.Echo) {
 	dbInstance := configs.GetDBInstance()
 
 	estimateItemTypeRepo := db.NewEstimateItemType(dbInstance)
-	estimateItemTypeSvc := services.NewEstimateItemType(estimateItemTypeRepo)
+	estimateItemRepo := db.NewEstimateItem(dbInstance)
+	estimateItemMaterialRepo := db.NewEstimateItemMaterial(dbInstance)
+	estimateItemTypeSvc := services.NewEstimateItemType(estimateItemTypeRepo, estimateItemRepo, estimateItemMaterialRepo)
 
 	g := e.Group("/user", middleware.ValidateTokenMiddleware)
 	g.POST("/v1/daijai/estimate_item_type/create", estimateItemTypeSvc.CreateEstimateItemType)
 	g.GET("/v1/daijai/estimate_item_type/estimateitemtypes", estimateItemTypeSvc.GetEstimateItemTypeAll)
+
 }

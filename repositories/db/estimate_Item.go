@@ -33,3 +33,11 @@ func (repo *EstimateItem) FindEstimateItemExist(id int) []dao.EstimateItem {
 	}
 	return []dao.EstimateItem{}
 }
+
+func (repo *EstimateItem) FindEstimateItemById(id int) (dao.EstimateItem, error) {
+	var estimateItemResponse dao.EstimateItem
+	if err := repo.db.Where("id = ?").Preload("EstimateItemType").First(&estimateItemResponse).Error; err != nil {
+		return dao.EstimateItem{}, err
+	}
+	return estimateItemResponse, nil
+}

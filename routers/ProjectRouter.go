@@ -13,8 +13,11 @@ func ProjectRouter(e *echo.Echo) {
 	configs.GetDBInstance()
 	dbInstance := configs.GetDBInstance()
 
+	estimateItemRepo := db.NewEstimateItem(dbInstance)
+	estimateItemMaterialRepo := db.NewEstimateItemMaterial(dbInstance)
+	materialRepo := db.MaterialRepository(dbInstance)
 	projectStatusRepo := db.NewProjectStatusRepository(dbInstance)
-	projectStatusSvc := services.NewProjectStatusService(projectStatusRepo)
+	projectStatusSvc := services.NewProjectStatusService(estimateItemMaterialRepo, materialRepo, estimateItemRepo, projectStatusRepo)
 
 	g := e.Group("/user", middleware.ValidateTokenMiddleware)
 	g.POST("/v1/daijai/projects/create", projectStatusSvc.CreateProject)
@@ -22,6 +25,7 @@ func ProjectRouter(e *echo.Echo) {
 	g.GET("/v1/daijai/projects", projectStatusSvc.GetAllProject)
 	g.PUT("/v1/daijai/projects/update", projectStatusSvc.UpdateProject)
 	//g.DELETE("/v1/daijai/project/delete-project", projectStatusSvc.DeleteProject)
+	g.GET("/v1/daijai/estimate_item_type/estimateitemtypes/:ProjectId", projectStatusSvc.GetEstimateItemList)
 
 }
 

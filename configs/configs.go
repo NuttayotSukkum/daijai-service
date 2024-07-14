@@ -22,7 +22,7 @@ func InitDb() *gorm.DB {
 
 	err = db.AutoMigrate(
 		&dao.Category3{},
-		&dao.ProjectStatus{},
+		&dao.Project{},
 		&dao.MaterialField{},
 		&dao.MaterialFieldDetail{},
 		&dao.Material{},
@@ -30,6 +30,7 @@ func InitDb() *gorm.DB {
 		&dao.EstimateItemTypes{},
 		&dao.EstimateItem{},
 		&dao.EstimateItemMaterial{},
+		//&dao.ProjectEstimateItem{},
 	)
 	if err != nil {
 		panic("failed to migrate database")

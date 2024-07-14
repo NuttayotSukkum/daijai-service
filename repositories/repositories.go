@@ -6,10 +6,10 @@ import (
 )
 
 type ProjectStatus interface {
-	Insert(projectStatus dao.ProjectStatus) error
-	GetByProjectId(projectId uuid.UUID) (dao.ProjectStatus, error)
-	GetAllProjectStatus() ([]dao.ProjectStatus, error)
-	UpdateProjectStatus(project dao.ProjectStatus) (dao.ProjectStatus, error)
+	Insert(projectStatus dao.Project) error
+	GetByProjectId(projectId int) (dao.Project, error)
+	GetAllProjectStatus() ([]dao.Project, error)
+	UpdateProjectStatus(project dao.Project) (dao.Project, error)
 	DeleteProject(projectId uuid.UUID) error
 }
 
@@ -55,15 +55,21 @@ type EstimateItemType interface {
 	FindEstimateItemTypesByName(name string) dao.EstimateItemTypes
 	FindEstimateItemTypesById(id int) ([]dao.EstimateItemTypes, error)
 	FindEstimateItemTypeAll() ([]dao.EstimateItemTypes, error)
+	FindEstimateItemsTypeById(id int) (dao.EstimateItemTypes, error)
 }
 
 type EstimateItem interface {
 	Insert(estimateItem dao.EstimateItem) error
 	FindEstimateItemAll() ([]dao.EstimateItem, error)
 	FindEstimateItemExist(id int) []dao.EstimateItem
+	FindEstimateItemById(id int) (dao.EstimateItem, error)
 }
 
 type EstimateItemMaterial interface {
 	Insert(estimateItemMaterial dao.EstimateItemMaterial) (dao.EstimateItemMaterial, error)
-	//FindMaterialById(id int) dao.EstimateItemMaterial
+	FindMaterialById(projectId int) []dao.EstimateItemMaterial
+}
+
+type ProjectEstimateItem interface {
+	Insert(projectEstimateItem dao.ProjectEstimateItem) error
 }

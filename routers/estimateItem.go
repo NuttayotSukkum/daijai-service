@@ -14,9 +14,11 @@ func EstimateItem(e *echo.Echo) {
 
 	estimateItemRepo := db.NewEstimateItem(dbInstance)
 	estimateItemTypeRepo := db.NewEstimateItemType(dbInstance)
-	estimateItemSvc := services.NewEstimateItem(estimateItemRepo, estimateItemTypeRepo)
+	estimateItemMaterial := db.NewEstimateItemMaterial(dbInstance)
+	estimateItemSvc := services.NewEstimateItem(estimateItemRepo, estimateItemTypeRepo, estimateItemMaterial)
 
 	g := e.Group("/user", middleware.ValidateTokenMiddleware)
 	g.POST("/v1/daijai/estimate_item/create", estimateItemSvc.CreateEstimateItem)
 	g.GET("/v1/daijai/estimate_item/estimateitems", estimateItemSvc.GetAll)
+	//g.GET("/v1/daijai/estimate_item/estimateitem/:Id", estimateItemSvc.GetEstimateItemById)
 }

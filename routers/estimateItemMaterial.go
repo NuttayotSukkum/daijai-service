@@ -15,7 +15,8 @@ func EstimateItemMaterial(e *echo.Echo) {
 	estimateItemRepo := db.NewEstimateItem(dbInstance)
 	estimateItemMaterialRepo := db.NewEstimateItemMaterial(dbInstance)
 	materialRepo := db.MaterialRepository(dbInstance)
-	estimateItemMaterialSvc := services.NewEstimateItemMaterials(estimateItemMaterialRepo, materialRepo, estimateItemRepo)
+	projectRepo := db.NewProjectStatusRepository(dbInstance)
+	estimateItemMaterialSvc := services.NewEstimateItemMaterials(estimateItemMaterialRepo, materialRepo, estimateItemRepo, projectRepo)
 
 	g := e.Group("/user", middleware.ValidateTokenMiddleware)
 	g.POST("/v1/daijai/estimate_item_material/create", estimateItemMaterialSvc.CreateItemMaterial)

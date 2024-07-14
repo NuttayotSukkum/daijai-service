@@ -1,17 +1,17 @@
 package dao
 
-import (
-	"github.com/shopspring/decimal"
-)
+import "github.com/shopspring/decimal"
 
 type EstimateItemMaterial struct {
-	Id             int          `gorm:"primary_key"`
+	Id             int `gorm:"primary_key"`
+	ProjectId      int
+	Project        Project      `gorm:"foreignKey:ProjectId;references:Id"`
 	EstimateItemId int          `gorm:"not null"`
 	EstimateItem   EstimateItem `gorm:"foreignKey:EstimateItemId;references:Id"`
 	MaterialId     int
-	Material       Material         `gor,:"foreignKey:MaterialId;references:Id"`
+	Material       Material         `gorm:"foreignKey:MaterialId;references:Id"`
 	MaterialAmount *decimal.Decimal `gorm:"type:decimal(10,2)"`
-	MaterialUnit   *string          `gorm:"size: 10"`
+	MaterialUnit   *string          `gorm:"size:10"`
 }
 
 func (EstimateItemMaterial) TableName() string {
