@@ -43,3 +43,11 @@ func (repo *EstimateItemType) FindEstimateItemTypeAll() ([]dao.EstimateItemTypes
 	}
 	return estimateItemTypeAll, nil
 }
+
+func (repo *EstimateItemType) FindEstimateItemsTypeById(id int) (dao.EstimateItemTypes, error) {
+	var estimateItemsType dao.EstimateItemTypes
+	if err := repo.db.Where("id = ?", id).First(&estimateItemsType).Error; err != nil {
+		return dao.EstimateItemTypes{}, err
+	}
+	return estimateItemsType, nil
+}

@@ -13,13 +13,15 @@ import (
 )
 
 type EstimateItemMaterials struct {
+	Project               repositories.ProjectStatus
 	EstimateItem          repositories.EstimateItem
 	EstimateItemMaterials repositories.EstimateItemMaterial
 	Material              repositories.Material
 }
 
-func NewEstimateItemMaterials(estimateItemMaterialRepo repositories.EstimateItemMaterial, materialsRepo repositories.Material, estimateItems repositories.EstimateItem) *EstimateItemMaterials {
+func NewEstimateItemMaterials(estimateItemMaterialRepo repositories.EstimateItemMaterial, materialsRepo repositories.Material, estimateItems repositories.EstimateItem, projectRepo repositories.ProjectStatus) *EstimateItemMaterials {
 	return &EstimateItemMaterials{
+		Project:               projectRepo,
 		EstimateItem:          estimateItems,
 		EstimateItemMaterials: estimateItemMaterialRepo,
 		Material:              materialsRepo,
@@ -35,7 +37,13 @@ func (svc *EstimateItemMaterials) CreateItemMaterial(e echo.Context) error {
 			Message:    err.Error(),
 		})
 	}
-
+	if req.ProjectId == 0 {
+		return e.JSON(http.StatusNotFound, handlers.ErrorResponse{
+			HTTPStatus: http.StatusBadRequest,
+			Time:       constants.TIME_NOW,
+			Message:    "Project Id is empty",
+		})
+	}
 	if req.EstimateItemId == 0 {
 		return echo.NewHTTPError(http.StatusBadRequest, handlers.ErrorResponse{
 			HTTPStatus: http.StatusBadRequest,
@@ -51,6 +59,18 @@ func (svc *EstimateItemMaterials) CreateItemMaterial(e echo.Context) error {
 			Message:    "materialId can not be null",
 		})
 	}
+	project, err := svc.Project.GetByProjectId(req.ProjectId)
+	if err != nil {
+		log.Println("err: %v", err)
+	}
+
+	if &project.Id == nil {
+		return e.JSON(http.StatusBadRequest, handlers.ErrorResponse{
+			HTTPStatus: http.StatusBadRequest,
+			Time:       constants.TIME_NOW,
+			Message:    "Project Id does not exist",
+		})
+	}
 
 	estimateItemExist := svc.EstimateItem.FindEstimateItemExist(req.EstimateItemId)
 
@@ -62,6 +82,7 @@ func (svc *EstimateItemMaterials) CreateItemMaterial(e echo.Context) error {
 		})
 	}
 	estimateItemMaterialMapper := dao.EstimateItemMaterial{
+		ProjectId:      req.ProjectId,
 		EstimateItemId: req.EstimateItemId,
 		MaterialAmount: req.MaterialAmount,
 		MaterialUnit:   req.MaterialUnit,
@@ -97,15 +118,11 @@ func (svc *EstimateItemMaterials) CreateItemMaterial(e echo.Context) error {
 
 		log.Println("estimateItem", estimateItem)
 	}
-	estimateItemMaterial, material := utils.ObjectMapper(estimateItem, materials)
-	log.Println(material)
+	projectDetail := utils.ObjectMapper(estimateItem, materials)
+	log.Println(projectDetail)
 	return e.JSON(http.StatusOK, handlers.SuccessResponseEstimateItemMaterial{
 		HTTPStatus: http.StatusOK,
 		Time:       constants.TIME_NOW,
-		Data:       estimateItemMaterial,
+		Data:       projectDetail,
 	})
 }
-
-//func (svc *EstimateItemMaterials) GetAll(e echo.Context) error {
-//
-//}

@@ -1,10 +1,7 @@
 package dao
 
-import "github.com/google/uuid"
-
-type ProjectStatus struct {
-	ID          uint `gorm:"primarykey"`
-	ProjectId   uuid.UUID
+type Project struct {
+	Id          int `gorm:"primary_key"`
 	ProjectName string
 	Status      string
 	CreatedAt   string
@@ -13,6 +10,6 @@ type ProjectStatus struct {
 	Details     bool
 }
 
-func (ProjectStatus) TableName() string {
-	return "tbl_project_status"
+func (Project) TableName() string {
+	return "tbl_project"
 }

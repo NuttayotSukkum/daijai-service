@@ -13,14 +13,16 @@ import (
 )
 
 type EstimateItem struct {
-	EstimateItemType repositories.EstimateItemType
-	EstimateItem     repositories.EstimateItem
+	EstimateItemType     repositories.EstimateItemType
+	EstimateItem         repositories.EstimateItem
+	EstimateItemMaterial repositories.EstimateItemMaterial
 }
 
-func NewEstimateItem(EstimateItemRepo repositories.EstimateItem, estimateItemTypeRepo repositories.EstimateItemType) *EstimateItem {
+func NewEstimateItem(EstimateItemRepo repositories.EstimateItem, estimateItemTypeRepo repositories.EstimateItemType, estimateItemMaterialRepo repositories.EstimateItemMaterial) *EstimateItem {
 	return &EstimateItem{
-		EstimateItem:     EstimateItemRepo,
-		EstimateItemType: estimateItemTypeRepo,
+		EstimateItem:         EstimateItemRepo,
+		EstimateItemType:     estimateItemTypeRepo,
+		EstimateItemMaterial: estimateItemMaterialRepo,
 	}
 }
 
@@ -111,3 +113,12 @@ func (svc *EstimateItem) GetAll(e echo.Context) error {
 		Data:       estimateItemAll,
 	})
 }
+
+//func (svc *EstimateItem) GetEstimateItemByProjectId(e echo.Context) error {
+//	projectIdStr := e.Param("Id")
+//	projectIdInt, err := strconv.Atoi(projectIdStr)
+//	if err != nil {
+//		log.Printf(err.Error())
+//	}
+//	project := svc.EstimateItemMaterial.FindMaterialById(projectIdInt)
+//}

@@ -13,11 +13,17 @@ import (
 )
 
 type EstimateItemType struct {
-	EstimateItemType repositories.EstimateItemType
+	EstimateItemType      repositories.EstimateItemType
+	EstimateItem          repositories.EstimateItem
+	EstimateItemMaterials repositories.EstimateItemMaterial
 }
 
-func NewEstimateItemType(repo repositories.EstimateItemType) *EstimateItemType {
-	return &EstimateItemType{EstimateItemType: repo}
+func NewEstimateItemType(repo repositories.EstimateItemType, estimateItemRepo repositories.EstimateItem, estimateMaterialRepo repositories.EstimateItemMaterial) *EstimateItemType {
+	return &EstimateItemType{
+		EstimateItemType:      repo,
+		EstimateItem:          estimateItemRepo,
+		EstimateItemMaterials: estimateMaterialRepo,
+	}
 }
 
 func (svc EstimateItemType) CreateEstimateItemType(e echo.Context) error {

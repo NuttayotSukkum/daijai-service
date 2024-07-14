@@ -6,9 +6,9 @@ import (
 )
 
 type EstimateItemMaterial struct {
-	MaterialAmount *decimal.Decimal
-	MaterialUnit   *string
-	Material       []dao.Material
+	MaterialAmount *decimal.Decimal `json:"materialAmount"`
+	MaterialUnit   *string          `json:"materialUnit"`
+	Material       []dao.Material   `json:"material"`
 }
 
 type EstimateItem struct {
@@ -23,4 +23,11 @@ type EstimateItemTypeResponse struct {
 	Id           int          `json:"estimate_item_type_id"`
 	Name         string       `json:"name"`
 	EstimateItem EstimateItem `json:"estimateItem"`
+}
+
+type ProjectResponse struct {
+	Id          int                      `json:"id"`
+	ProjectName string                   `json:"projectName"`
+	CreateBy    string                   `json:"createBy"`
+	Detail      EstimateItemTypeResponse `json:"detail"`
 }

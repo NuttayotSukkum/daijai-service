@@ -5,24 +5,7 @@ import (
 	"daijai-service/models/response"
 )
 
-func ObjectMapper(object dao.EstimateItemMaterial, materials []dao.Material) (response.EstimateItemTypeResponse, response.EstimateItem) {
-
-	if len(object.EstimateItem.EstimateItemType.Name) == 0 {
-		estimateMaterialResponse := response.EstimateItemMaterial{
-			MaterialAmount: object.MaterialAmount,
-			MaterialUnit:   object.MaterialUnit,
-			Material:       materials,
-		}
-
-		estimateItemResponse := response.EstimateItem{
-			Id:                   object.EstimateItem.Id,
-			Code:                 object.EstimateItem.Code,
-			Name:                 object.EstimateItem.Name,
-			Price:                object.EstimateItem.Price,
-			EstimateItemMaterial: estimateMaterialResponse,
-		}
-		return response.EstimateItemTypeResponse{}, estimateItemResponse
-	}
+func ObjectMapper(object dao.EstimateItemMaterial, materials []dao.Material) response.ProjectResponse {
 
 	estimateMaterialResponse := response.EstimateItemMaterial{
 		MaterialAmount: object.MaterialAmount,
@@ -43,5 +26,11 @@ func ObjectMapper(object dao.EstimateItemMaterial, materials []dao.Material) (re
 		Name:         object.EstimateItem.EstimateItemType.Name,
 		EstimateItem: estimateItemResponse,
 	}
-	return estimateItemMaterial, response.EstimateItem{}
+	project := response.ProjectResponse{
+		Id:          object.ProjectId,
+		ProjectName: object.Project.ProjectName,
+		CreateBy:    object.Project.CreatedBy,
+		Detail:      estimateItemMaterial,
+	}
+	return project
 }

@@ -88,7 +88,7 @@ type SuccessResponseEstimateItemList struct {
 }
 
 type SuccessResponseEstimateItemMaterial struct {
-	HTTPStatus int                               `json:"httpStatus"`
-	Time       string                            `json:"time"`
-	Data       response.EstimateItemTypeResponse `json:"data"`
+	HTTPStatus int                      `json:"httpStatus"`
+	Time       string                   `json:"time"`
+	Data       response.ProjectResponse `json:"data"`
 }

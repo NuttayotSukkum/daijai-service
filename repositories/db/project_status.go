@@ -16,7 +16,7 @@ func NewProjectStatusRepository(db *gorm.DB) repositories.ProjectStatus {
 	return &ProjectStatus{db: db}
 }
 
-func (repo ProjectStatus) Insert(projectStatus dao.ProjectStatus) error {
+func (repo ProjectStatus) Insert(projectStatus dao.Project) error {
 	err := repo.db.Create(&projectStatus).Error
 	if err != nil {
 		return err
@@ -24,17 +24,17 @@ func (repo ProjectStatus) Insert(projectStatus dao.ProjectStatus) error {
 	return nil
 }
 
-func (repo ProjectStatus) GetByProjectId(projectId uuid.UUID) (dao.ProjectStatus, error) {
-	var projectStatus dao.ProjectStatus
-	err := repo.db.Where("project_id = ?", projectId).First(&projectStatus).Error
+func (repo ProjectStatus) GetByProjectId(projectId int) (dao.Project, error) {
+	var projectStatus dao.Project
+	err := repo.db.Where("id = ?", projectId).First(&projectStatus).Error
 	if err != nil {
 		return projectStatus, err
 	}
 	return projectStatus, nil
 }
 
-func (repo ProjectStatus) GetAllProjectStatus() ([]dao.ProjectStatus, error) {
-	var allProject []dao.ProjectStatus
+func (repo ProjectStatus) GetAllProjectStatus() ([]dao.Project, error) {
+	var allProject []dao.Project
 	err := repo.db.Find(&allProject).Error
 	if err != nil {
 		return nil, err
@@ -42,8 +42,8 @@ func (repo ProjectStatus) GetAllProjectStatus() ([]dao.ProjectStatus, error) {
 	return allProject, nil
 }
 
-func (repo *ProjectStatus) UpdateProjectStatus(project dao.ProjectStatus) (dao.ProjectStatus, error) {
-	var response dao.ProjectStatus
+func (repo *ProjectStatus) UpdateProjectStatus(project dao.Project) (dao.Project, error) {
+	var response dao.Project
 
 	if err := repo.db.Where("project_name = ?", project.ProjectName).First(&response).Error; err != nil {
 		return response, err
@@ -62,7 +62,7 @@ func (repo *ProjectStatus) UpdateProjectStatus(project dao.ProjectStatus) (dao.P
 }
 
 func (repo *ProjectStatus) DeleteProject(projectId uuid.UUID) error {
-	var project dao.ProjectStatus
+	var project dao.Project
 	err := repo.db.Where("project_id = ?", projectId).Delete(project).Error
 	if err != nil {
 		return err
