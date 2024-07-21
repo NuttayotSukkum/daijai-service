@@ -2,27 +2,31 @@
 Authentication
 
 CURL
-curl --location 'localhost:8084/v1/daijai/register' \
+Post Method
+curl --location 'localhost:8080/user/v1/daijai/project' \
+--header 'token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTYzNTMyMTMsInVzZXJJZCI6IjlhOGU4NmUyLTJlMmQtNGJhNy1hZTdhLTQwNGMyZDY4N2FmMyJ9.uanZxtyPJdP8ElI2TwCxrUWLbDey2WeiVOgOFl5GBLs' \
 --header 'Content-Type: application/json' \
---data-raw '{
-    "firstname":"Sutida",
-    "lastname":"ratanajaruen",
-    "email":"deerS@hotmail.com",
-    "password":"123456",
-    "role":"user"
+--data '{
+"projectName":"MK_restaurant",
+"createdBy":"sitikorn"
 }'
 
-curl --location 'localhost:8084/v1/daijai/login' \
+Get Method Get projectId
+curl --location 'localhost:8080/user/v1/daijai/Name' \
+--header 'token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTYzNTMyMTMsInVzZXJJZCI6IjlhOGU4NmUyLTJlMmQtNGJhNy1hZTdhLTQwNGMyZDY4N2FmMyJ9.uanZxtyPJdP8ElI2TwCxrUWLbDey2WeiVOgOFl5GBLs' \
+--data ''
+
+Get Method All project
+curl --location 'localhost:8080/user/v1/daijai/getall' \
+--header 'token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTYzNTMyMTMsInVzZXJJZCI6IjlhOGU4NmUyLTJlMmQtNGJhNy1hZTdhLTQwNGMyZDY4N2FmMyJ9.uanZxtyPJdP8ElI2TwCxrUWLbDey2WeiVOgOFl5GBLs' \
+--data ''
+
+Update
+curl --location --request PUT 'localhost:8080/user/v1/daijai/update-project' \
+--header 'token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTYzNTcwMjQsInVzZXJJZCI6IjlhOGU4NmUyLTJlMmQtNGJhNy1hZTdhLTQwNGMyZDY4N2FmMyJ9.VD4-uxsmcbi-mpGZeXmvSzuO2pXv1pyWlae0DZa9Ndk' \
 --header 'Content-Type: application/json' \
---data-raw '{
-    "username":"deerS@hotmail.com",
-    "password":"123456"
+--data '{
+"projectName":"MK_restaurant",
+"status":"approved",
+"createdBy":"pakornsit"
 }'
-
-curl --location 'localhost:8084/user/v1/daijai/all' \
---header 'token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTUwMDk2OTUsInVzZXJJZCI6Nn0.S1WaqNbqEqIM-rx7s3bs2wjYxIAO5_5Owsu_Ix50L6A' \
---header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTQ5ODIyODYsInVzZXJJZCI6NX0.IxU7eYOCS8tQPYrGyTdlOhnRkw6lUQ5SinXUIvZI-64'
-
-curl --location 'localhost:8084/user/v1/daijai/profile' \
---header 'token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTUwNjQ4MDUsInVzZXJJZCI6IjA3OTc5ODcyLTZjYTgtNDdkZS05OThhLTJlMjBkNzNjYzk0NSJ9.EovFNSAcicMTtn-Y09h0jFYEauqYOFvz_dEVRmSX18E' \
---header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTQ5ODc5NjIsInVzZXJJZCI6NX0.X6Gm8daNbcfTSaMTDR3rG-vCgun2Rbgu58CVBN5V-J4'

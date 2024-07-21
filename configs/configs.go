@@ -20,13 +20,25 @@ func InitDb() *gorm.DB {
 		panic("failed to connect database")
 	}
 
-	err = db.AutoMigrate(&dao.Project{})
+	err = db.AutoMigrate(
+		&dao.Category3{},
+		&dao.Project{},
+		&dao.MaterialField{},
+		&dao.MaterialFieldDetail{},
+		&dao.Material{},
+		&dao.MaterialDetail{},
+		&dao.EstimateItemTypes{},
+		&dao.EstimateItem{},
+		&dao.EstimateItemMaterial{},
+		//&dao.ProjectEstimateItem{},
+	)
 	if err != nil {
 		panic("failed to migrate database")
 	}
 
 	log.Println("Database migrated")
 	return db
+
 }
 
 func GetDBInstance() *gorm.DB {

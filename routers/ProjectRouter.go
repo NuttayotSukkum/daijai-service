@@ -3,17 +3,30 @@ package routers
 import (
 	"daijai-service/configs"
 	"daijai-service/middleware"
+	"daijai-service/repositories/db"
 	"daijai-service/services"
 	"github.com/labstack/echo/v4"
 )
 
-func ProjectRouter() *echo.Echo {
-	e := echo.New()
+func ProjectRouter(e *echo.Echo) {
+
 	configs.GetDBInstance()
+	dbInstance := configs.GetDBInstance()
+
+	estimateItemRepo := db.NewEstimateItem(dbInstance)
+	estimateItemMaterialRepo := db.NewEstimateItemMaterial(dbInstance)
+	materialRepo := db.MaterialRepository(dbInstance)
+	projectStatusRepo := db.NewProjectStatusRepository(dbInstance)
+	projectStatusSvc := services.NewProjectStatusService(estimateItemMaterialRepo, materialRepo, estimateItemRepo, projectStatusRepo)
 
 	g := e.Group("/user", middleware.ValidateTokenMiddleware)
-	g.POST("/v1/daijai/project", services.CeateProject)
-	return e
+	g.POST("/v1/daijai/projects/create", projectStatusSvc.CreateProject)
+	g.GET("/v1/daijai/project/:id", projectStatusSvc.GetProjectStatus)
+	g.GET("/v1/daijai/projects", projectStatusSvc.GetAllProject)
+	g.PUT("/v1/daijai/projects/update", projectStatusSvc.UpdateProject)
+	//g.DELETE("/v1/daijai/project/delete-project", projectStatusSvc.DeleteProject)
+	g.GET("/v1/daijai/estimate_item_type/estimateitemtypes/:ProjectId", projectStatusSvc.GetEstimateItemList)
+
 }
 
 func Execute(e *echo.Echo) {
