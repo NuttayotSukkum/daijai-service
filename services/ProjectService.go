@@ -254,50 +254,102 @@ func (svc *ProjectStatusRepo) GetEstimateItemList(e echo.Context) error {
 		})
 	}
 
-	var responseProject response.ProjectResponseList
-	responseProject.Id = projectMaterials[0].Project.Id
-	responseProject.ProjectName = projectMaterials[0].Project.ProjectName
-	responseProject.CreateBy = projectMaterials[0].Project.CreatedAt
+	projectMap := make(map[int]*response.ProjectResponseList)
+	itemTypeMap := make(map[int]*response.EstimateItemTypeResponseAll)
+	estimateItemMap := make(map[int]*response.EstimateItemAll)
 
-	var itemAll response.EstimateItemAll
+	for _, entry := range projectMaterials {
+		projectData := entry.Project
+		projectId := projectData.Id
+		projectName := projectData.ProjectName
+		createdBy := projectData.CreatedBy
 
-	estimateItemType := make(map[int]*response.EstimateItemTypeResponseAll)
-	estimateItemsMap := make(map[int]*response.EstimateItemAll)
+		itemTypeData := entry.EstimateItem.EstimateItemType
+		itemTypeId := itemTypeData.Id
+		itemTypeName := itemTypeData.Name
 
-	for _, material := range projectMaterials {
-		estimateItem := &material.EstimateItem
+		estimateItemData := entry.EstimateItem
+		estimateItemId := estimateItemData.Id
+		estimateItemName := estimateItemData.Name
+		estimateItemCode := estimateItemData.Code
+		estimateItemPrice := estimateItemData.Price
+		estimateItemTypeId := estimateItemData.EstimateItemTypeId // Ensure this field exists and is set
 
-		if _, ok := estimateItemType[estimateItem.EstimateItemType.Id]; !ok {
-			estimateItemType[estimateItem.EstimateItemType.Id] = &response.EstimateItemTypeResponseAll{
-				Id:   estimateItem.EstimateItemType.Id,
-				Name: estimateItem.EstimateItemType.Name,
+		materialData := entry.Material
+		materialId := materialData.Id
+		cat3 := materialData.Category3
+		materialCode := materialData.Code
+		materialDescription := materialData.Description
+		materialAmount := entry.MaterialAmount
+		materialUnit := entry.MaterialUnit
+
+		if _, exists := projectMap[projectId]; !exists {
+			projectMap[projectId] = &response.ProjectResponseList{
+				Id:          projectId,
+				ProjectName: projectName,
+				CreateBy:    createdBy,
+				Detail:      []response.EstimateItemTypeResponseAll{},
 			}
 		}
 
-		if _, ok := estimateItemsMap[estimateItem.Id]; !ok {
-			itemAll := response.EstimateItemAll{
-				Id:                   estimateItem.Id,
-				Name:                 estimateItem.Name,
-				Code:                 estimateItem.Code,
-				Price:                estimateItem.Price,
+		if _, exists := itemTypeMap[itemTypeId]; !exists {
+			itemTypeMap[itemTypeId] = &response.EstimateItemTypeResponseAll{
+				Id:           itemTypeId,
+				Name:         itemTypeName,
+				EstimateItem: []response.EstimateItemAll{},
+			}
+		}
+
+		if _, exists := estimateItemMap[estimateItemId]; !exists {
+			estimateItemMap[estimateItemId] = &response.EstimateItemAll{
+				Id:                   estimateItemId,
+				Name:                 estimateItemName,
+				Code:                 estimateItemCode,
+				Price:                estimateItemPrice,
+				EstimateItemTypeId:   estimateItemTypeId, // Ensure this field exists and is set
 				EstimateItemMaterial: []response.EstimateItemMaterial{},
 			}
-			estimateItemType[estimateItem.EstimateItemType.Id].EstimateItem = append(estimateItemType[estimateItem.EstimateItemType.Id].EstimateItem, itemAll)
 		}
 
-		itemMaterial := response.EstimateItemMaterial{
-			MaterialAmount: material.MaterialAmount,
-			MaterialUnit:   material.MaterialUnit,
-			Material:       []dao.Material{material.Material},
+		estimateItemMaterial := response.EstimateItemMaterial{
+			MaterialAmount: materialAmount,
+			MaterialUnit:   materialUnit,
+			Material: []dao.Material{{
+				Id:          materialId,
+				Category3:   cat3,
+				Code:        materialCode,
+				Description: materialDescription,
+			}},
 		}
-		log.Printf("itemMaterial: %s\n", itemMaterial)
-		estimateItemsMap[estimateItem.Id].EstimateItemMaterial = append(estimateItemsMap[estimateItem.Id].EstimateItemMaterial, itemMaterial)
-		itemAll.EstimateItemMaterial = estimateItemsMap[estimateItem.Id].EstimateItemMaterial
+
+		estimateItemMap[estimateItemId].EstimateItemMaterial = append(estimateItemMap[estimateItemId].EstimateItemMaterial, estimateItemMaterial)
 	}
 
-	for _, estimateItemType := range estimateItemType {
-		responseProject.Detail = append(responseProject.Detail, *estimateItemType)
+	for _, item := range estimateItemMap {
+		itemTypeId := item.EstimateItemTypeId
+		if _, exists := itemTypeMap[itemTypeId]; exists {
+			itemTypeMap[itemTypeId].EstimateItem = append(itemTypeMap[itemTypeId].EstimateItem, *item)
+		} else {
+			log.Println("Item type not found:", itemTypeId)
+		}
+		log.Println("Step 12")
+	}
+	log.Println("Step 20")
+	for _, itemType := range itemTypeMap {
+		for projectId := range projectMap {
+			if itemType == nil {
+				log.Printf("projectId:%d", projectId)
+			} else {
+				projectMap[projectId].Detail = append(projectMap[projectId].Detail, *itemType)
+				log.Printf("items:%s", projectMap[projectId].Detail)
+			}
+		}
 	}
 
-	return e.JSON(http.StatusOK, responseProject)
+	var projectResponseList []response.ProjectResponseList
+	for _, project := range projectMap {
+		projectResponseList = append(projectResponseList, *project)
+	}
+
+	return e.JSON(http.StatusOK, projectResponseList)
 }

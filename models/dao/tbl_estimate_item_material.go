@@ -9,7 +9,7 @@ type EstimateItemMaterial struct {
 	EstimateItemId int          `gorm:"not null"`
 	EstimateItem   EstimateItem `gorm:"foreignKey:EstimateItemId;references:Id"`
 	MaterialId     int
-	Material       Material         `gorm:"foreignKey:MaterialId;references:Id"`
+	Material       *Material        `gorm:"foreignKey:MaterialId;references:Id"`
 	MaterialAmount *decimal.Decimal `gorm:"type:decimal(10,2)"`
 	MaterialUnit   *string          `gorm:"size:10"`
 }
